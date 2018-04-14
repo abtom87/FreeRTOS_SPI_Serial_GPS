@@ -6,6 +6,8 @@
  */
 #include "spi_max7219.h"
 
+#define SUMMER_TIME
+
 void init_MAX7219_powerup()
 {
 	write_to_MAX7219(MAX7219_ADDR_DECODE_MODE, 0xFF);
@@ -32,7 +34,7 @@ void write_to_MAX7219(uint8_t addr, uint8_t data)
 	Addr = (uint16_t) addr;
 	Data = (uint16_t) data;
 
-	Data_to_send = ((Addr << 8) & 0xFF00) | Data;
+	Data_to_send = ( ( (Addr << 8) & 0xFF00) | Data );
 
 	SET_CS_LOW();
 	SPI_send_data(Data_to_send);
@@ -84,17 +86,35 @@ void Display_Time_MAX7219(char *str_to_parse, char *str_to_extract,
 		k++;
 	}
 
-	if (Time_buffer[1] == 0x39)
+
+#ifdef SUMMER_TIME /* write summer/ winter time   */
+	if ( (Time_buffer[1] == 0x38) &&  (Time_buffer[0] == 0x31) )
 	{
-		Time_buffer[1] = 0x30;
+		Time_buffer[1] = 0x30; /* If HH is 18 , change 1 to 2 and 8 to 0 */
 		Time_buffer[0] += 1;
 	}
 	else
-		Time_buffer[1] += 2; /* write summer winter time   */
+		if( (Time_buffer[1] == 0x39) &&  (Time_buffer[0] == 0x31) )
+		{
+			Time_buffer[1] = 0x31; /* If HH is 19 , change 1 to 2 and 9 to 1 */
+			Time_buffer[0] +=1;
+		}
+		else
+		Time_buffer[1] += 2;
+#else
+
+	if ( (Time_buffer[1] == 0x39) &&  (Time_buffer[0] == 0x31) )
+	{
+		Time_buffer[1] = 0x30;  /* If HH is 19 , change 1 to 2 and 9 to 0 */
+		Time_buffer[0] += 1;
+	}
+	else
+		Time_buffer[1] += 1;
+#endif
 
 	time_to_disp = strtol(Time_buffer, (char **) NULL, 10);
 
-	if (time_to_disp >= 2559050)
+	if (time_to_disp >= 244905)
 		clearDisplay_MAX7219();
 
 	Display_longNum_MAX7219(time_to_disp);
