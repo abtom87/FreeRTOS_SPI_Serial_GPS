@@ -27,7 +27,7 @@ void USART_TX_string(char *str_to_transmit)
 
 }
 /*
- * Configure USART2(PD5, PD6) to redirect printf data to host PC.
+ * Configure USART2(PD5 Tx, PD6 Rx) to redirect printf data to host PC.
  */
 void init_USART2(void) {
   GPIO_InitTypeDef GPIO_InitStruct;
