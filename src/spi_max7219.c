@@ -88,13 +88,13 @@ void Display_Time_MAX7219(char *str_to_parse, char *str_to_extract,
 
 
 #ifdef SUMMER_TIME /* write summer/ winter time   */
-	if ( (Time_buffer[1] == 0x38) &&  (Time_buffer[0] == 0x31) )
+	if ( (Time_buffer[1] == 0x38) )
 	{
 		Time_buffer[1] = 0x30; /* If HH is 18 , change 1 to 2 and 8 to 0 */
 		Time_buffer[0] += 1;
 	}
 	else
-		if( (Time_buffer[1] == 0x39) &&  (Time_buffer[0] == 0x31) )
+		if( (Time_buffer[1] == 0x39)  )
 		{
 			Time_buffer[1] = 0x31; /* If HH is 19 , change 1 to 2 and 9 to 1 */
 			Time_buffer[0] +=1;
